@@ -1,10 +1,26 @@
+
+sudo: required
 language: java
 
-notifications:
-  email: false
-
-before_install:
- - mvn -version
-
 jdk:
-  - oraclejdk7
+  - openjdk8
+
+script:
+  - mvn clean compile assembly:single
+
+before_deploy:
+    - mkdir MiningBuild
+    - find . -name '*.jar' -exec cp {} ./MiningBuild \;
+    - cd /home/travis/build/semantic-conflicts/okhttp/MiningBuild
+    - tar -zcvf result.tar.gz *
+deploy:
+  provider: releases
+  api_key: $GITHUB_TOKEN
+  file: result.tar.gz
+  name: fetchjar-1151c9853ccc3c9c3211c613b9b845b925f8c6a6
+  file_glob: true
+  overwrite: true
+  skip_cleanup: true
+  on:
+    all_branches: true 
+            
